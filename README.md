@@ -1,0 +1,1 @@
+# rosmed-vastai-image
