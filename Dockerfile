@@ -5,6 +5,45 @@ FROM ${VAST_BASE}
 ARG UBUNTU_VERSION=24.04
 
 ################################################################################
+# Install ROS2 Jazzy Jalisco
+# See https://docs.ros.org/en/jazzy/Installation/Ubuntu-Install-Debs.html
+################################################################################
+
+WORKDIR /home/user
+#
+# Set locale
+#
+RUN apt update && apt install -y locales \
+    && locale-gen en_US en_US.UTF-8 \
+    && update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8 \
+    && export LANG=en_US.UTF-8
+
+#
+# Enable required repositories
+#
+RUN apt install -y software-properties-common \
+    && add-apt-repository universe \
+    && apt update && apt install curl -y \
+    && export ROS_APT_SOURCE_VERSION=$(curl -s https://api.github.com/repos/ros-infrastructure/ros-apt-source/releases/latest | grep -F "tag_name" | awk -F'"' '{print $4}') \
+    && curl -L -o /tmp/ros2-apt-source.deb "https://github.com/ros-infrastructure/ros-apt-source/releases/download/${ROS_APT_SOURCE_VERSION}/ros2-apt-source_${ROS_APT_SOURCE_VERSION}.$(. /etc/os-release && echo ${UBUNTU_CODENAME:-${VERSION_CODENAME}})_all.deb" \
+    && dpkg -i /tmp/ros2-apt-source.deb
+
+#
+# Install development tools
+#
+RUN apt update && apt install -y ros-dev-tools
+
+#
+# Install ROS
+#
+RUN apt update \
+    && apt install -y ros-dev-tools \
+    && apt upgrade -y \
+    && apt install -y ros-jazzy-desktop \
+    && apt install -y ros-jazzy-ros-base
+
+
+################################################################################
 # Libraries for ISMR 2021 Tutorial
 ################################################################################
 WORKDIR /home/user
