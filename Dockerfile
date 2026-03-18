@@ -104,20 +104,22 @@ RUN mkdir -p /home/user/slicer/modules \
 #
 # SlicerIGSIO
 #
-RUN apt update \
-    && apt install -y opencl-clhpp-headers \
-    && apt install -y opencl-headers \
-    && apt install -y ocl-icd-libopencl1 \
-    && apt install -y ocl-icd-opencl-dev
 
-RUN apt update && apt install -y nvidia-opencl-dev
+# NOTE: GPU volume reconstruction is turned off temporarily because CL/cl.hpp is not available anymore on Ubuntu 24.04
+
+#RUN apt update \
+#    && apt install -y opencl-clhpp-headers \
+#    && apt install -y opencl-headers \
+#    && apt install -y ocl-icd-libopencl1 \
+#    && apt install -y ocl-icd-opencl-dev
+#RUN apt update && apt install -y nvidia-opencl-dev
 
 RUN mkdir -p /home/user/slicer/modules \
     && cd /home/user/slicer/modules \
     && git clone https://github.com/IGSIO/SlicerIGSIO\
     && mkdir SlicerIGSIO-build \
     && cd SlicerIGSIO-build \
-    && cmake -DCMAKE_BUILD_TYPE:STRING=Release -DSlicer_DIR:PATH=/home/user/slicer/Slicer-SuperBuild-Release/Slicer-build ../SlicerIGSIO \
+    && cmake -DCMAKE_BUILD_TYPE:STRING=Release -DSlicer_DIR:PATH=/home/user/slicer/Slicer-SuperBuild-Release/Slicer-build -DIGSIO_USE_GPU_RECONSTRUCT=OFF ../SlicerIGSIO \
     && make -j4
 
 #
